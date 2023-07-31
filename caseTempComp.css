@@ -1,0 +1,18 @@
+.body {
+    background-color: white;
+}
+.h
+{
+    height: 10px;
+}
+.slds-modal__footer {
+    justify-content: flex-end;
+  }
+  
+  /* Flexbox for right-aligned buttons */
+  .footer-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* Adjust this value for spacing between buttons */
+  }
+  
