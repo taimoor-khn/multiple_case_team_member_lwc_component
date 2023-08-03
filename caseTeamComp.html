@@ -1,110 +1,88 @@
+<template>
 
-<template >
-
-  <div class="slds-is-relative" >
+  <div class="slds-is-relative">
     <!-- Modal/Popup Box LWC header here -->
 
     <header class="slds-modal__header">
-      <button
-        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
-        title="Close"
-        onclick={closeModal}
-      >
-        <lightning-icon
-          icon-name="utility:close"
-          alternative-text="close"
-          variant="inverse"
-          size="small"
-        ></lightning-icon>
+      <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
+        onclick={closeModal}>
+        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+          size="small"></lightning-icon>
       </button>
-      <h2 class="slds-text-heading_medium slds-hyphenate" >
-      Search for and add member
+      <h2 class="slds-text-heading_medium slds-hyphenate">
+        Search for and add member
       </h2>
     </header>
     <!-- Modal/Popup Box LWC body starts here   -->
     <template for:each={itemList} for:item="item" for:index="index">
-    <div  key={item.id} class="" style="justify-content: center !important;">  
-      <lightning-layout horizontal-align="center">
-      <lightning-layout-item size="auto">
-        <!-- First Div -->
-        <div class="slds-m-top_medium">
-          <lightning-button-menu id={index} icon-name={item.iconName}  data-comb={index} onselect={handleChoice} alternative-text="Show menu" variant="border-filled" menu-alignment="auto">
-            <lightning-menu-item label="User" icon-name="standard:avatar" value="User"></lightning-menu-item>
-            <lightning-menu-item label="Contact" icon-name="standard:person_name" value="Contact"></lightning-menu-item>                  
-        </lightning-button-menu>
+      <div key={item.id} class="" style="justify-content: center !important;">
+        <lightning-layout horizontal-align="center">
+          <lightning-layout-item size="auto">
+            <!-- First Div -->
+            <div class="slds-m-top_medium">
+              <lightning-button-menu id={index} icon-name={item.iconName} data-comb={index} onselect={handleChoice}
+                alternative-text="Show menu" variant="border-filled" menu-alignment="auto">
+                <lightning-menu-item label="User" icon-name="standard:avatar" value="User"></lightning-menu-item>
+                <lightning-menu-item label="Contact" icon-name="standard:person_name"
+                  value="Contact"></lightning-menu-item>
+              </lightning-button-menu>
+            </div>
+          </lightning-layout-item>
+          <lightning-layout-item size="5">
+            <!-- Second Div -->
+            <div>
+              <lightning-record-edit-form object-api-name="Case">
+                <div
+                  class="slds-col slds-m-top_medium slds-m-left_none slds-p-left_none slds-m-right_none slds-p-right_none">
+                  <!-- Add input fields hereif:true={valuesEqual(index)} -->
+                  <div if:true={item.contact}>
+                    <lightning-input-field id={index} name="contact" variant="label-hidden" data-contact={index}
+                      onchange={contactDetail} field-name="Component_Contact__c"></lightning-input-field>
+                  </div>
+                  <div if:true={item.user}>
+                    <lightning-input-field id={index} name="user" variant="label-hidden" data-user={index}
+                      onchange={userDetail} field-name="Component_User__c"></lightning-input-field>
+                  </div>
+                  <!-- Add more fieldsif:true={valuesEqual(index)}  as needed -->
+                </div>
+
+              </lightning-record-edit-form>
+            </div>
+          </lightning-layout-item>
+          <lightning-layout-item class="" size="5">
+            <!-- Third Div -->
+            <div class="slds-m-left_small" style="margin-top:-0.01rem !important;">
+
+              <lightning-combobox style="height: 9.3%important;" class="" name="teamRole" label="" data-index={index}
+                value={value} placeholder="Select Member Role" options={teamRoles}
+                onchange={handleChange}></lightning-combobox>
+            </div>
+
+          </lightning-layout-item>
+
+          <lightning-layout-item size="auto">
+            <div class="slds-col slds-m-top_large slds-m-left_medium">
+              <lightning-icon name="delete" icon-name="utility:delete" size="x-small" data-index={item.id}
+                access-key={item.id} id={index} alternative-text="User!" title="Delete Row"
+                onclick={removeRow}></lightning-icon>
+
+            </div>
+          </lightning-layout-item>
+        </lightning-layout>
       </div>
-    </lightning-layout-item>
-    <lightning-layout-item size="5">
-      <!-- Second Div -->
-      <div>
-        <lightning-record-edit-form 
-        object-api-name="Case"
-      > 
-      <div class="slds-col slds-m-top_medium slds-m-left_none slds-p-left_none slds-m-right_none slds-p-right_none" > 
-        <!-- Add input fields hereif:true={valuesEqual(index)} -->
-      <div if:true={item.contact}>
-        <lightning-input-field  id={index} name="contact" variant = "label-hidden" data-contact={index} onchange={contactDetail} field-name="Component_Contact__c"></lightning-input-field>
-      </div>
-      <div if:true={item.user}>
-        <lightning-input-field  id={index} name="user" variant = "label-hidden" data-user={index} onchange={userDetail} field-name="Component_User__c"></lightning-input-field>
-      </div>
-        <!-- Add more fieldsif:true={valuesEqual(index)}  as needed -->
-      </div>  
-        
-      </lightning-record-edit-form>
+    </template>
+    <div class="slds-col slds-text-align_right slds-m-top_medium slds-m-right_x-large slds-m-bottom_medium">
+      <lightning-button variant="brand" label="Add Row" onclick={addRow}></lightning-button>
     </div>
-  </lightning-layout-item>
-  <lightning-layout-item class="" size="5" >
-    <!-- Third Div -->
-    <div class="slds-m-left_small" style="margin-top:-0.01rem !important;">
-      
-      <lightning-combobox  style="height: 9.3%important;"
-      class=""
-      name="teamRole"
-      label=""
-      data-index={index}
-      value={value}
-      placeholder="Select Progress"
-      options={teamRoles}
-      onchange={handleChange} ></lightning-combobox></div>
- 
-  </lightning-layout-item>
-
-  <lightning-layout-item size="auto">
-    <div class="slds-col slds-m-top_large slds-m-left_medium"> 
-      <lightning-icon name="delete" icon-name="utility:delete" size="x-small" data-index={item.id} access-key={item.id} id={index}
-        alternative-text="User!" title="Delete Row" onclick={removeRow} ></lightning-icon>
-
-</div>   </lightning-layout-item>
-</lightning-layout>
-        </div> 
-          </template>
-          <div class="slds-col slds-text-align_right slds-m-top_medium slds-m-right_x-large slds-m-bottom_medium"> 
-          <lightning-button
-          variant="brand"
-          
-          label="Add Row"
-          onclick={addRow}
-        ></lightning-button>
-          </div>  
-              <lightning-spinner if:true={isLoaded} style="background-color: white !important" alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
-        </div>
-    <footer class="slds-modal__footer slds-modal__footer_directional" style=" justify-content: flex-end !important; " >
-      <div class="footer-buttons" style="  display: flex;
+    <lightning-spinner if:true={isLoaded} style="background-color: white !important" alternative-text="Loading"
+      size="medium" class="spinnerClass"></lightning-spinner>
+  </div>
+  <footer class="slds-modal__footer slds-modal__footer_directional" style=" justify-content: flex-end !important; ">
+    <div class="footer-buttons" style="  display: flex;
       justify-content: flex-end;
       gap: 10px; ">
-      <lightning-button
-   
-      label="Cancel"
-      onclick={handleCancel}
-    ></lightning-button>
-      <lightning-button
-   
-      label="Save"
-      onclick={handleCreateRecord}
-    ></lightning-button>
-      </div> 
-     </footer>
+      <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+      <lightning-button label="Save" onclick={handleCreateRecord}></lightning-button>
+    </div>
+  </footer>
 </template>
-
-
