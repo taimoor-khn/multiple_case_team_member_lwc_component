@@ -4,8 +4,8 @@ import searchContactsByName from "@salesforce/apex/AddCaseTeamMembersController.
 import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class CaseTeamComp extends LightningElement {
-   @track visbleIndex;
-   @track isModalOpen=true;
+    @track visbleIndex;
+    @track isModalOpen = true;
     @track keyIndex = 0;
     @track itemList = [
         {
@@ -14,8 +14,8 @@ export default class CaseTeamComp extends LightningElement {
             memberId: '',
             teamRoleId: '',
             user: true,
-            contact:false,
-            iconName:'standard:avatar'
+            contact: false,
+            iconName: 'standard:avatar'
         }
     ];
 
@@ -40,8 +40,8 @@ export default class CaseTeamComp extends LightningElement {
 
     get options() {
         return [
-            { label: 'User', value: 'User' , iconName: 'standard:account' },
-            { label: 'Contact', value: 'Contact' , iconName: 'standard:account' },
+            { label: 'User', value: 'User', iconName: 'standard:account' },
+            { label: 'Contact', value: 'Contact', iconName: 'standard:account' },
         ];
     }
     @track showContact = false;
@@ -49,23 +49,21 @@ export default class CaseTeamComp extends LightningElement {
     handleChoice(event) {
         console.log('event.currentTarget.dataset.comb' + event.currentTarget.dataset.comb);
         console.log('event.detail.name' + event.detail.label)
-        console.log('event.detail.value'+event.detail.value)
-           if(event.detail.value==='User')
-       {  
-        this.itemList[event.currentTarget.dataset.comb].iconName='standard:avatar';
+        console.log('event.detail.value' + event.detail.value)
+        if (event.detail.value === 'User') {
+            this.itemList[event.currentTarget.dataset.comb].iconName = 'standard:avatar';
             this.itemList[event.currentTarget.dataset.comb].user = true;
             this.itemList[event.currentTarget.dataset.comb].contact = false;
         }
-           if(event.detail.value==='Contact'){   
-            this.itemList[event.currentTarget.dataset.comb].iconName='standard:person_name';
+        if (event.detail.value === 'Contact') {
+            this.itemList[event.currentTarget.dataset.comb].iconName = 'standard:person_name';
             this.itemList[event.currentTarget.dataset.comb].user = false;
             this.itemList[event.currentTarget.dataset.comb].contact = true;
-       }
+        }
     }
-    
-    valuesEqual(_index)
-    {
-       return this.visbleIndex===this._index;
+
+    valuesEqual(_index) {
+        return this.visbleIndex === this._index;
     }
     contactDetail(event) {
         this.itemList[event.currentTarget.dataset.contact].memberId = event.target.value;
@@ -73,13 +71,36 @@ export default class CaseTeamComp extends LightningElement {
     userDetail(event) {
 
         this.itemList[event.currentTarget.dataset.user].memberId = event.target.value;
-
     }
     @track isLoaded = false;
+    @track completed = true;
     handleCreateRecord() {
         this.isLoaded = true;
+        this.completed = true;
+        for (let acc of this.itemList) {
+            console.log(acc.memberId + '+' + acc.teamRoleId + '+' + acc.parentId)
+            if (acc.memberId === '' || acc.teamRoleId === '' || acc.parentId == '') {
+                const evt = new ShowToastEvent({
+                    title: 'Error',
+                    message: 'Incomplete Fields',
+                    variant: 'error',
+                    mode: 'dismissable'
+                });
+                this.dispatchEvent(evt);
+                this.isLoaded = false;
+                this.completed = false;
+                break;
+            }
+        }
+        if (this.completed) {
+            this.callinApexFunction();
+        }
 
+    }
+
+    callinApexFunction() {
         searchContactsByName({ lstring: this.itemList }).then((result) => {
+
             this.isLoaded = false;
             const evt = new ShowToastEvent({
                 title: 'Inserted',
@@ -95,27 +116,17 @@ export default class CaseTeamComp extends LightningElement {
             .catch((error) => {
                 // Handle any errors from the server
                 this.isLoaded = false;
+                const evt = new ShowToastEvent({
+                    title: 'Error',
+                    message: error.body.message,
+                    variant: 'error',
+                    mode: 'dismissable'
+                });
+                this.dispatchEvent(evt);
 
-                if (error.body.message === 'Invalid id: ') {
-                    const evt = new ShowToastEvent({
-                        title: 'Error',
-                        message: 'Incomplete Fields',
-                        variant: 'error',
-                        mode: 'dismissable'
-                    });
-                    this.dispatchEvent(evt);
-                }
-                else {
-                    const evt = new ShowToastEvent({
-                        title: 'Error',
-                        message: error.body.message,
-                        variant: 'error',
-                        mode: 'dismissable'
-                    });
-                    this.dispatchEvent(evt);
-                }
             });
     }
+
     addRow() {
         let objRow = {
             id: ++this.keyIndex,
@@ -123,8 +134,8 @@ export default class CaseTeamComp extends LightningElement {
             memberId: '',
             teamRoleId: '',
             user: true,
-            contact:false,
-            iconName:'standard:avatar'
+            contact: false,
+            iconName: 'standard:avatar'
         }
         this.itemList = [...this.itemList, objRow];
     }
